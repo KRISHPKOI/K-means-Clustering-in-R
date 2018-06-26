@@ -1,0 +1,114 @@
+---
+title: "K-means clustering Red/White wine"
+author: "Krishna P Koirala"
+date: "6/26/2018"
+output:
+    md_document:
+     variant: markdown_github
+---
+
+# Introduction
+There are many clustering algorithms out there. In this exercise, we will be presenting the K-means clustering algorithm, which is considered to be one of the simplest clustering algorithms. Despite its simplicity, the K-means is vastly used for clustering in many data science applications, and is especially useful if you need to quickly discover insights from unlabeled data.
+Some real-world applications of k-means:
+Customer segmentation
+Understand what the visitors of a website are trying to accomplish
+Pattern recognition
+Machine learning
+Data compression
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+rm(list = ls())
+df1 <- read.csv("winequality-red.csv", sep = ';')
+df2 <- read.csv('winequality-white.csv', sep = ';')
+```
+
+```{r}
+head(df1)
+head(df2)
+```
+
+# Creating red and white label on each data frame
+
+
+```{r}
+df1$label <- sapply(df1$pH, function(x){'red'})
+df2$label <- sapply(df2$pH, function(x){'white'})
+```
+
+# Combining two dfs together
+
+```{r}
+wine <- rbind(df1, df2)
+```
+
+```{r}
+colnames(wine)
+unique(wine$label)
+```
+
+# EDA
+
+```{r}
+library(ggplot2)
+ggplot(aes(residual.sugar), data = wine) + geom_histogram(aes(fill = label), bins = 50, color ='black') + scale_fill_manual(values = c('#ae4554', "#faf7ea")) + theme_classic()
+```
+
+
+```{r}
+ggplot(aes(citric.acid), data = wine) + geom_histogram(aes(fill = label), bins = 50, color = 'black') + scale_fill_manual(values = c('#ae4554', "#faf7ea")) + theme_classic()
+```
+
+
+```{r}
+ggplot(aes(alcohol), data = wine) + geom_histogram(aes(fill = label), bins = 50, color = 'black') + scale_fill_manual(values = c('#ae4554', "#faf7ea")) + theme_classic()
+```
+
+
+```{r}
+ggplot(aes(citric.acid, residual.sugar), data = wine) + geom_point(aes(color = label), size = 0.5, alpha = 0.3) + theme_dark() + scale_color_manual(values = c('#ae4554', "#faf7ea"))
+```
+
+```{r}
+ggplot(aes(volatile.acidity, residual.sugar), data = wine) + geom_point(aes(color = label), size = 0.5, alpha = 0.3) + theme_dark() + scale_color_manual(values = c('#ae4554', "#faf7ea"))
+```
+
+
+# Building model
+
+
+```{r}
+
+clus.data <- wine[, 1:12]
+colnames(clus.data)
+```
+
+```{r}
+wine.cluster <- kmeans(clus.data, 2)
+
+```
+
+
+```{r}
+wine.cluster$centers
+```
+
+# Model evaluation
+
+Although in unsupervises learning we will not have
+already existing labeled values to compare with
+newly predicted value. Here we just compare them for
+learning purpose.
+
+```{r}
+table(wine$label, wine.cluster$cluster)
+```
+
